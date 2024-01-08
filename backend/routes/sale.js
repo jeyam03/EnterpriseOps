@@ -239,7 +239,22 @@ router.delete("/delete-sale/:id", async (req, res) => {
   }
 });
 
+//
 
+router.get("/latest-billno", async (req, res) => {
+  try {
+    const latestBill = await Sale.findOne().sort({ _id: -1 }).limit(1);
 
+    if (!latestBill) {
+      return res.status(404).json({ error: "No bill found" });
+    }
+
+    res.json(latestBill.sbillno);
+  } catch (error) {
+    console.error("Error getting latest bill:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+}
+);
 
 export default router;
