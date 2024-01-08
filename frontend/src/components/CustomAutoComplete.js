@@ -1,4 +1,4 @@
-import React , {useEffect}from 'react'
+import React from 'react'
 import { Autocomplete, InputAdornment, TextField } from '@mui/material';
 import { styled } from '@mui/system';
 
@@ -8,14 +8,8 @@ const StyledAutocomplete = styled(Autocomplete)`
   }
 `;
 
-const CustomAutoComplete = ({ label, valueState = ["", (e) => { }], options, width, icon, def = "" }) => {
+const CustomAutoComplete = ({ label, valueState = ["", (e) => { }], options, width, icon }) => {
   const [value, setValue] = valueState;
-
-  useEffect(() => {
-    if (def !== "") {
-      setValue(def);
-    }
-  }, [def, setValue]);
 
   return (
     <StyledAutocomplete

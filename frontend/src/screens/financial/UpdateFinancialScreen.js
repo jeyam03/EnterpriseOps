@@ -26,7 +26,7 @@ const UpdateFinancialScreen = () => {
   const [date, setDate] = useState(dayjs());
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState('');
-  const [type, setType] = useState('');
+  const [type, setType] = useState('Debit');
   const [description, setDescription] = useState('');
   const [edit, setEdit] = useState(false);
 
@@ -82,7 +82,6 @@ const UpdateFinancialScreen = () => {
           width={'25%'}
           valueState={[type, setType]}
           options={['Credit', 'Debit']}
-          def='Debit'
         />
 
         <CustomAutoComplete

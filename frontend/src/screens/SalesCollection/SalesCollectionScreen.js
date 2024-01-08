@@ -122,12 +122,12 @@ const SalesCollectionScreen = () => {
   return (
     <div className='pl-4 pr-12 flex flex-col gap-4 w-full -mt-16'>
       <div className='flex justify-between'>
-        <PageTitle title={'All Sales Collections'} className={'w-1/2 text-right'} />
+        <PageTitle title={'Sales Collections'} className={'w-1/2 text-right'} />
         <div className='absolute left-4 bottom-4'>
-          <div className='flex gap-2 items-center p-1.5 border-2 border-orange-700 rounded-3xl relative'>
+          <div className='flex gap-2 items-center p-1.5 border-2 border-orange-700 rounded-full relative'>
             <p className='text-orange-700 text-xs absolute -top-2.5 left-4 bg-white px-1 font-medium'>View By</p>
             <CustomButton
-              className={`rounded-3xl !p-2 text-sm ${billViewMode ? 'bg-orange-700 text-white' : ''}`}
+              className={`!rounded-full !p-2 text-sm ${billViewMode ? 'bg-orange-700 text-white' : ''}`}
               onClick={() => {
                 setBillViewMode(true);
               }}
@@ -135,7 +135,7 @@ const SalesCollectionScreen = () => {
               text={'Bill No.'}
             />
             <CustomButton
-              className={`rounded-3xl !p-2 text-sm ${!billViewMode ? 'bg-orange-700 text-white' : ''}`}
+              className={`!rounded-full !p-2 text-sm ${!billViewMode ? 'bg-orange-700 text-white' : ''}`}
               onClick={() => {
                 setBillViewMode(false);
               }}

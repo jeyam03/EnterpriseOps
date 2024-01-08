@@ -30,7 +30,7 @@ const SalesScreen = () => {
         setFetchedData(res.data);
       })
   }, [])
-  
+
   const handleKeyPress = useCallback((event) => {
     if (event.ctrlKey && event.code === "Enter") {
       navigate('/sales/add');
@@ -88,7 +88,7 @@ const SalesScreen = () => {
   return (
     <div className='pl-4 pr-12 flex flex-col gap-4 w-full -mt-16'>
       <div className='flex justify-between'>
-        <PageTitle title={'All Sales'} className={'w-1/2 text-right'} />
+        <PageTitle title={'Sales'} className={'w-1/2 text-right'} />
         <CustomButton
           onClick={() => { navigate('/sales/add') }}
           icon={<IoMdAdd />}

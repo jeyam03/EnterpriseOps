@@ -45,7 +45,7 @@ const PartiesScreen = () => {
   return (
     <div className='pl-4 pr-12 flex flex-col gap-4 w-full -mt-16'>
       <div className='flex justify-between'>
-        <PageTitle title={'All Parties'} className={'w-1/2 text-right'} />
+        <PageTitle title={'Parties'} className={'w-1/2 text-right'} />
         <CustomButton
           onClick={() => { navigate('/parties/add') }}
           icon={<IoMdAdd />}

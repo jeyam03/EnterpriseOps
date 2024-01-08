@@ -58,7 +58,7 @@ const EmployeeScreen = () => {
   return (
     <div className='pl-4 pr-12 flex flex-col gap-4 w-full -mt-16'>
       <div className='flex justify-between'>
-        <PageTitle title={'All Employees'} className={'w-1/2 text-right'} />
+        <PageTitle title={'Employees'} className={'w-1/2 text-right'} />
         <CustomButton
           onClick={() => { navigate('/employees/add') }}
           icon={<IoMdAdd />}

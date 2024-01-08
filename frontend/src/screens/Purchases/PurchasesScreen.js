@@ -70,7 +70,7 @@ const PurchasesScreen = () => {
   return (
     <div className='pl-4 pr-12 flex flex-col gap-4 w-full -mt-16'>
       <div className='flex justify-between'>
-        <PageTitle title={'All Purchases'} className={'w-1/2 text-right'} />
+        <PageTitle title={'Purchases'} className={'w-1/2 text-right'} />
         <CustomButton
           onClick={() => { navigate('/purchases/add') }}
           icon={<IoMdAdd />}

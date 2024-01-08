@@ -60,7 +60,7 @@ const FinancialScreen = () => {
   return (
     <div className='pl-4 pr-12 flex flex-col gap-4 w-full -mt-16'>
       <div className='flex justify-between'>
-        <PageTitle title={'All Records'} className={'w-1/2 text-right'} />
+        <PageTitle title={'Records'} className={'w-1/2 text-right'} />
         <CustomButton
           onClick={() => { navigate('/financials/add') }}
           icon={<IoMdAdd />}
