@@ -32,6 +32,7 @@ const SalesInputTable = ({ tableState = ["", (e) => { }] }) => {
       newData[index].p_id = element?.p_id;
       newData[index].piecesPerCase = element?.piecesPerCase;
       newData[index].saleRate = element?.salesRate;
+      newData[index].case = 1;
     }
 
     if (field === 'case' || field === 'piece' || field === 'saleRate') {
@@ -121,6 +122,15 @@ const SalesInputTable = ({ tableState = ["", (e) => { }] }) => {
                 <FormControl fullWidth>
                   <Autocomplete
                     value={row.productName}
+                    filterOptions={(options, params) => {
+                      const words = params.inputValue.split(' ');
+                      const filtered = options.filter((option) => {
+                        return words.every((word) => {
+                          return option.toLowerCase().indexOf(word.toLowerCase()) !== -1;
+                        })
+                      })
+                      return filtered;
+                    }}
                     onChange={(event, newValue) => {
                       handleInputChange(index, 'productName', newValue);
                     }}

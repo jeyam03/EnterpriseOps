@@ -32,6 +32,7 @@ const SalesInputTable = ({ tableState = ["", (e) => { }] }) => {
       newData[index].route = element?.route;
       newData[index].partyName = element?.party_name;
       newData[index].remainingCredit = element?.credit;
+      newData[index].type = 'Cash'
 
       axios.get(`${EMPLOYEE_URL}/get-employees-by-psr/${element?.route}`)
         .then((res) => {
@@ -162,7 +163,7 @@ const SalesInputTable = ({ tableState = ["", (e) => { }] }) => {
                     onChange={(event, newValue) => {
                       handleInputChange(index, 'type', newValue);
                     }}
-                    options={['Cash', 'Cheque', 'UPI', 'Others']}
+                    options={['Cash', 'UPI', 'Cheque', 'Others']}
                     sx={{ width: 150 }}
                     renderInput={(params) => <TextField
                       {...params}

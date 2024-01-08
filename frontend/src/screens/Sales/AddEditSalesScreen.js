@@ -44,7 +44,7 @@ const AddEditSalesScreen = () => {
   const [psrOptions, setPsrOptions] = useState([]);
   const [psrName, setPsrName] = useState("");
   const [amountCollected, setAmountCollected] = useState("");
-  const [type, setType] = useState("");
+  const [type, setType] = useState("Cash");
 
   const [edit, setEdit] = useState(false);
 
@@ -55,6 +55,16 @@ const AddEditSalesScreen = () => {
       .then((res) => {
         setParties(res.data);
         setPartyNames(res.data.map((item) => item.partyName));
+      })
+  }, [])
+
+  useEffect(() => {
+    axios.get(`${SALE_URL}/latest-billno`)
+      .then((res) => {
+        setBillno(parseInt(res.data) + 1);
+      })
+      .catch((err) => {
+        console.log(err);
       })
   }, [])
 
@@ -132,6 +142,126 @@ const AddEditSalesScreen = () => {
     setCredit((totalAmount - collected).toFixed(2));
   }, [amountCollected, totalAmount])
 
+  const handleAddSale = (next = false) => {
+    if (billno === '' || date === '' || partyName === '') {
+      return window.alert('Enter all fields');
+    }
+
+    if (!edit) {
+      if (amountCollected !== '' && amountCollected !== null) {
+        if (psrName === '' || type === '') {
+          console.log(psrName, amountCollected, type);
+          return window.alert('Enter all fields in Sales Collection');
+        }
+      }
+    }
+
+    let valid = true;
+    tableData.forEach((item) => {
+      if (Object.values(item).every((value) => value === '')) {
+        return;
+      }
+      Object.keys(item).forEach((value) => {
+        if (value === 'piece' || value === 'case') {
+          return;
+        }
+        if (item[value] === null || item[value] === undefined || item[value] === '') {
+          valid = false;
+        }
+      });
+
+      const piece = parseInt(item.piece);
+      const casee = parseInt(item.case);
+
+      if (isNaN(piece) || piece === 0) {
+        if (isNaN(casee) || casee === 0) {
+          valid = false;
+        }
+      }
+    });
+    if (!valid) {
+      return window.alert('Enter all fields in the table');
+    }
+
+    const filteredTableData = tableData.filter((item) => {
+      return !Object.values(item).every((value) => value === '');
+    });
+
+    if (edit) {
+      axios.put(`${SALE_URL}/update-sale/${id}`, {
+        sbillno: billno,
+        party_id: partyID,
+        date: date,
+        totalAmount: totalAmount,
+        credit: credit,
+        details: filteredTableData.map((item) => {
+          return {
+            p_id: item.p_id,
+            case: item.case,
+            piece: item.piece,
+            saleRate: item.saleRate,
+          }
+        })
+      })
+        .then((res) => {
+          console.log(res)
+          navigate('/sales/');
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    } else {
+      axios.post(`${SALE_URL}/add-sale`, {
+        sbillno: billno,
+        party_id: partyID,
+        date: date,
+        totalAmount: totalAmount,
+        credit: totalAmount,
+        details: filteredTableData.map((item) => {
+          return {
+            p_id: item.p_id,
+            case: item.case,
+            piece: item.piece,
+            saleRate: item.saleRate,
+          }
+        })
+      })
+        .then((res) => {
+          console.log(res)
+
+          if (psrName !== '' && amountCollected !== '' && type !== '') {
+            axios.post(`${SALES_COLLECTION_URL}/add-collections`, {
+              s_billNo: billno,
+              date: date,
+              psr: psrName,
+              amountCollected: amountCollected,
+              type: type,
+            })
+              .then((res2) => {
+                console.log(res2);
+                if (next) {
+                  window.location.reload();
+                } else {
+                  navigate('/sales/');
+                }
+              })
+              .catch((err) => {
+                console.log(err);
+              })
+          } else {
+            if (next) {
+              window.location.reload();
+            } else {
+              navigate('/sales/');
+            }
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    }
+  }
+
   return (
     <div className='px-8 flex flex-col gap-4 w-full'>
       <div className='flex gap-4 items-center'>
@@ -194,7 +324,7 @@ const AddEditSalesScreen = () => {
       <div className='flex flex-row items-center gap-8 w-full'>
         <CustomAutoComplete
           label='Party Name'
-          width='35%'
+          width='50%'
           valueState={[partyName, setPartyName]}
           options={partyNames}
         />
@@ -208,148 +338,46 @@ const AddEditSalesScreen = () => {
           title={'Route'}
           value={route}
         />
-
-        <div className={`${edit && 'hidden'} bg-orange-50 flex flex-row items-center gap-8 w-full px-6 py-1 rounded-xl relative`}>
-          <PageTitle title='Sales Collection (Optional)' className='!text-sm absolute -top-5 left-4' />
-          <CustomAutoComplete
-            label='PSR Name'
-            width='33%'
-            valueState={[psrName, setPsrName]}
-            options={psrOptions}
-          />
-
-          <CustomTextField
-            label='Amount Collected'
-            className='w-1/3'
-            valueState={[amountCollected, setAmountCollected]}
-            type='number'
-          />
-
-          <CustomAutoComplete
-            label='Type'
-            width='33%'
-            valueState={[type, setType]}
-            options={['Cash', 'Cheque', 'UPI', 'Others']}
-          />
-        </div>
       </div>
 
       <SalesInputTable tableState={[tableData, setTableData]} />
 
-      <div className='flex justify-end mt-4'>
+      <div className={`${edit && 'hidden'} bg-orange-50 flex flex-row items-center gap-8 w-full px-6 py-1 rounded-xl relative mt-8`}>
+        <PageTitle title='Sales Collection (Optional)' className='!text-base' />
+        <CustomAutoComplete
+          label='PSR Name'
+          width='33%'
+          valueState={[psrName, setPsrName]}
+          options={psrOptions}
+        />
+
+        <CustomTextField
+          label='Amount Collected'
+          className='w-1/3'
+          valueState={[amountCollected, setAmountCollected]}
+          type='number'
+        />
+
+        <CustomAutoComplete
+          label='Type'
+          width='33%'
+          valueState={[type, setType]}
+          options={['Cash', 'UPI']}
+        />
+      </div>
+
+      <div className='flex justify-end mt-4 gap-4'>
+        {!edit && (
+          <CustomButton
+            onClick={() => handleAddSale(true)}
+            icon={<IoMdCheckmarkCircleOutline />}
+            text={`Add Next Sale`}
+          />
+        )}
         <CustomButton
-          onClick={() => {
-            if (billno === '' || date === '' || partyName === '') {
-              return window.alert('Enter all fields');
-            }
-
-            if (!edit) {
-              if (psrName !== '' || amountCollected !== '' || type !== '') {
-                if (psrName === '' || amountCollected === '' || type === '') {
-                  return window.alert('Enter all fields in Sales Collection');
-                }
-              }
-            }
-
-            let valid = true;
-            tableData.forEach((item) => {
-              if (Object.values(item).every((value) => value === '')) {
-                return;
-              }
-              Object.keys(item).forEach((value) => {
-                if (value === 'piece' || value === 'case') {
-                  return;
-                }
-                if (item[value] === null || item[value] === undefined || item[value] === '') {
-                  valid = false;
-                }
-              });
-
-              const piece = parseInt(item.piece);
-              const casee = parseInt(item.case);
-
-              if (isNaN(piece) || piece === 0) {
-                if (isNaN(casee) || casee === 0) {
-                  valid = false;
-                }
-              }
-            });
-            if (!valid) {
-              return window.alert('Enter all fields in the table');
-            }
-
-            const filteredTableData = tableData.filter((item) => {
-              return !Object.values(item).every((value) => value === '');
-            });
-
-            if (edit) {
-              axios.put(`${SALE_URL}/update-sale/${id}`, {
-                sbillno: billno,
-                party_id: partyID,
-                date: date,
-                totalAmount: totalAmount,
-                credit: credit,
-                details: filteredTableData.map((item) => {
-                  return {
-                    p_id: item.p_id,
-                    case: item.case,
-                    piece: item.piece,
-                    saleRate: item.saleRate,
-                  }
-                })
-              })
-                .then((res) => {
-                  console.log(res)
-                  navigate('/sales/');
-                })
-                .catch((err) => {
-                  console.log(err);
-                })
-            } else {
-              axios.post(`${SALE_URL}/add-sale`, {
-                sbillno: billno,
-                party_id: partyID,
-                date: date,
-                totalAmount: totalAmount,
-                credit: totalAmount,
-                details: filteredTableData.map((item) => {
-                  return {
-                    p_id: item.p_id,
-                    case: item.case,
-                    piece: item.piece,
-                    saleRate: item.saleRate,
-                  }
-                })
-              })
-                .then((res) => {
-                  console.log(res)
-
-                  if (psrName !== '' || amountCollected !== '' || type !== '') {
-                    axios.post(`${SALES_COLLECTION_URL}/add-collections`, {
-                      s_billNo: billno,
-                      date: date,
-                      psr: psrName,
-                      amountCollected: amountCollected,
-                      type: type,
-                    })
-                      .then((res2) => {
-                        console.log(res2);
-                        navigate('/sales/');
-                      })
-                      .catch((err) => {
-                        console.log(err);
-                      })
-                  } else {
-                    navigate('/sales/');
-                  }
-                })
-                .catch((err) => {
-                  console.log(err);
-                })
-            }
-          }}
+          onClick={() => handleAddSale(false)}
           icon={<IoMdCheckmarkCircleOutline />}
-          text={`Confirm & ${edit ? 'Edit' : 'Add'} Sale`}
+          text={`Confirm & ${edit ? 'Edit Sale' : 'Go Back'}`}
         />
       </div>
     </div>
